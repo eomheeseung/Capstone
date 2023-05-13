@@ -21,15 +21,17 @@ public class ComparisonOfSimilarities {
         );
         return diff;
     }
+
     private static Double[] getDoubleToken(String descriptor) {
         String[] lines = descriptor.split("\n");  // 문자열을 줄 단위로 분리하여 배열에 저장
-        Double[] result = new Double[lines.length/3];
-        int idx=0;
+        Double[] result = new Double[lines.length / 3];
+        int idx = 0;
         for (int i = 2; i < lines.length; i += 3) {  // 인덱스 2부터 3씩 증가하며 3번째 줄씩 가져옴
             result[idx++] = Double.parseDouble(lines[i]);  // StringBuilder 객체에 줄 단위로 추가
         }
         return result;
     }
+
     private static String getOriginalDescriptor() {
         return "0\n" +
                 ": \n" +
@@ -330,7 +332,7 @@ public class ComparisonOfSimilarities {
                 "-0.06652019917964935\n" +
                 "99\n" +
                 ": \n" +
-                "-0.019729560241103172\n"+
+                "-0.019729560241103172\n" +
                 "100\n" +
                 ": \n" +
                 "-0.013319021090865135\n" +

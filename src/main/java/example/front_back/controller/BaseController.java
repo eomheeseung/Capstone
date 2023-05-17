@@ -5,7 +5,8 @@ import example.front_back.service.ComparisonOfSimilarities;
 import example.front_back.service.CrimeDataLogic;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,8 +53,23 @@ public class BaseController {
      */
     @PostMapping("/crime")
     public String crimeTest(@RequestBody String crime) {
-        log.info(crime);
-        crimeDataLogic.stringToJson(crime);
+//        log.info("범죄자 정보"+crime);
+        JSONArray jsonArray = new JSONArray(crime);
+
+        // 객체를 저장할 배열
+        JSONObject[] objects = new JSONObject[jsonArray.length()];
+
+        // 데이터를 객체로 변환하여 배열에 저장
+        for (int i = 0; i < jsonArray.length(); i++) {
+            org.json.JSONObject jsonObject = jsonArray.getJSONObject(i);
+            objects[i] = jsonObject;
+        }
+
+        // 배열에 저장된 객체 출력 (예시)
+        for (int i = 0; i < objects.length; i++) {
+            log.info("Object " + i + ": " + objects[i]);
+        }
+//        crimeDataLogic.stringToJson(crime);
         return "ok";
     }
 

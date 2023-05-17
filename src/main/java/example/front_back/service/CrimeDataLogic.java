@@ -16,7 +16,7 @@ public class CrimeDataLogic {
 
         // 5번째 value가 이더리움에 저장되어 있는 사진의 descriptors 값이므로 get
         String savedDescriptors = (String) jsonObject.get("5");
-        log.info(savedDescriptors);
+        log.info("5: "+savedDescriptors);
 
         // 다시 string -> json
         JSONObject descriptorJson = new JSONObject(savedDescriptors);
@@ -24,7 +24,7 @@ public class CrimeDataLogic {
         // log를 확인해보면 "descriptors"라는 키를 이용해서 128개의 데이터를 가져옴
         // usingData 변수 사용해서 웹캠으로 들어온 데이터랑 비교하면 됨.
         Object usingData = descriptorJson.get("descriptors");
-        log.info(usingData.toString());
+        log.info("descriptor"+usingData.toString());
 
 //        return descriptorJson;
     }

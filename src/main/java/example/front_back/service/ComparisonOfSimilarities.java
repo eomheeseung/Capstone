@@ -1,12 +1,16 @@
 package example.front_back.service;
 
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.stream.IntStream;
 
 @Service
 public class ComparisonOfSimilarities {
     public Double[] labeledDescriptor = getDoubleDescriptor();
+    public static ArrayList<JSONObject> criminals = new ArrayList<>();
+    public static double threshold = 0.6;
 
     private static Double[] getDoubleDescriptor() {
         String str = getOriginalDescriptor();

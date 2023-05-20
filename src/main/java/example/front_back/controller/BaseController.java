@@ -32,16 +32,45 @@ public class BaseController {
             e.printStackTrace();
         }
 
+        //넘어오는 쿼리 디스크립터 Double[]로 넣기 위해 파싱
         String[] keys = decodedJsonStr.replace("{", "").replace("}", "").replace("=", "").split(",");
-        Double[] values = new Double[keys.length];
+        Double[] queryDescriptor = new Double[keys.length];
 
+        //쿼리 디스크립터 초기화
         for (int i = 0; i < keys.length; i++) {
             String[] keyValue = keys[i].split(":");
-            values[i] = Double.parseDouble(keyValue[1]);
+            queryDescriptor[i] = Double.parseDouble(keyValue[1]);
         }
 
-        double compareSimilarity = cos.compareSimilarity(cos.labeledDescriptor, values);
-        log.info(String.valueOf(compareSimilarity));
+        //범죄자 중 가장 높은 유사도와 높은 유사도를 갖는 범죄자 인덱스 찾기 위한 변수들
+        int findIndex=0;
+        double findMaxSimilarities=0;
+
+        //파싱한 쿼리 디스크립터와 범죄자의 디스크립터를 비교
+        for (int i=0; i<=cos.criminals.size(); i++){
+
+            //유사도 비교를 위해 범죄자 디스크립터의 JSONObject 타입을 Double[]로 변환
+            JSONArray ArrayDescriptor = new JSONArray(cos.criminals.get(i).toString());
+            Double[] DoubleDescriptor = new Double[ArrayDescriptor.length()];
+            for (int j = 0; j < ArrayDescriptor.length(); j++) {
+                DoubleDescriptor[j] = ArrayDescriptor.getDouble(j);
+            }
+
+            //범죄자 중 가장 높은 유사도를 찾음
+            double findSimilarities = cos.compareSimilarity(DoubleDescriptor, queryDescriptor);
+            if (findMaxSimilarities < findSimilarities){
+                findMaxSimilarities = findSimilarities;
+                findIndex = i;
+            }
+        }
+
+        if (cos.threshold < findMaxSimilarities){
+            log.info("가장 유사한 범죄자 발견: "+cos.criminals.get(findIndex));
+            log.info("유사도: "+findMaxSimilarities);
+        }
+
+//        double compareSimilarity = cos.compareSimilarity(cos.labeledDescriptor, queryDescriptor);
+//        log.info(String.valueOf(compareSimilarity));
     }
 
     /**
@@ -53,23 +82,33 @@ public class BaseController {
      */
     @PostMapping("/crime")
     public String crimeTest(@RequestBody String crime) {
-//        log.info("범죄자 정보"+crime);
+        //json으로 변환
         JSONArray jsonArray = new JSONArray(crime);
 
-        // 객체를 저장할 배열
-        JSONObject[] objects = new JSONObject[jsonArray.length()];
-
-        // 데이터를 객체로 변환하여 배열에 저장
+        //jsonObject로 변환 후 cos.criminals에 저장
         for (int i = 0; i < jsonArray.length(); i++) {
-            org.json.JSONObject jsonObject = jsonArray.getJSONObject(i);
-            objects[i] = jsonObject;
+
+            //기존 5번 키값의 이상한 값들을 제거하고 descriptor 값만 뽑음
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+            String descriptorString = (String) jsonObject.get("5");
+            JSONObject descriptorJson = new JSONObject(descriptorString);
+            JSONArray descriptorArray = (JSONArray) descriptorJson.get("descriptors");
+
+            // 디스크립터의 대괄호가 2개 있어서 json 형태를 하나 벗김으로써 괄호 제거
+            JSONArray innerDescriptors = descriptorArray.getJSONArray(0);
+
+            //기존 5번 키값 제거하고 새로 파싱한 descriptor 추가
+            jsonObject.remove("5");
+            jsonObject.put("5", innerDescriptors);
+
+            cos.criminals.add(jsonObject);
         }
 
-        // 배열에 저장된 객체 출력 (예시)
-        for (int i = 0; i < objects.length; i++) {
-            log.info("Object " + i + ": " + objects[i]);
+        // cos.criminals에 저장된 객체 출력
+        for (int i = 0; i < cos.criminals.size(); i++) {
+            log.info("<저장 완료> 범죄자 " + i + ": " + cos.criminals.get(i));
         }
-//        crimeDataLogic.stringToJson(crime);
+
         return "ok";
     }
 

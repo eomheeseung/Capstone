@@ -35,42 +35,42 @@ public class BaseController {
         //넘어오는 쿼리 디스크립터 Double[]로 넣기 위해 파싱
         String[] keys = decodedJsonStr.replace("{", "").replace("}", "").replace("=", "").split(",");
         Double[] queryDescriptor = new Double[keys.length];
-
         //쿼리 디스크립터 초기화
         for (int i = 0; i < keys.length; i++) {
             String[] keyValue = keys[i].split(":");
             queryDescriptor[i] = Double.parseDouble(keyValue[1]);
         }
 
-        //범죄자 중 가장 높은 유사도와 높은 유사도를 갖는 범죄자 인덱스 찾기 위한 변수들
+        //범죄자 중 가장 낮은 유사도와 낮은 유사도를 갖는 범죄자 인덱스 찾기 위한 변수들
         int findIndex=0;
-        double findMaxSimilarities=0;
+        double findMinSimilarities=1;
 
+
+        System.out.println(cos.criminals.size());
         //파싱한 쿼리 디스크립터와 범죄자의 디스크립터를 비교
-        for (int i=0; i<=cos.criminals.size(); i++){
+        for (int i=0; i<cos.criminals.size(); i++){
 
             //유사도 비교를 위해 범죄자 디스크립터의 JSONObject 타입을 Double[]로 변환
-            JSONArray ArrayDescriptor = new JSONArray(cos.criminals.get(i).toString());
-            Double[] DoubleDescriptor = new Double[ArrayDescriptor.length()];
-            for (int j = 0; j < ArrayDescriptor.length(); j++) {
-                DoubleDescriptor[j] = ArrayDescriptor.getDouble(j);
+            JSONArray ArrayCriminalDescriptor = new JSONArray(cos.criminals.get(i).get("5").toString());
+
+            Double[] DoubleCriminalDescriptor = new Double[ArrayCriminalDescriptor.length()];
+            for (int j = 0; j < ArrayCriminalDescriptor.length(); j++) {
+                DoubleCriminalDescriptor[j] = ArrayCriminalDescriptor.getDouble(j);
             }
 
-            //범죄자 중 가장 높은 유사도를 찾음
-            double findSimilarities = cos.compareSimilarity(DoubleDescriptor, queryDescriptor);
-            if (findMaxSimilarities < findSimilarities){
-                findMaxSimilarities = findSimilarities;
+            // 범죄자 중 가장 낮은 유사도를 찾음
+            double findSimilarities = cos.compareSimilarity(DoubleCriminalDescriptor, queryDescriptor);
+            if (findMinSimilarities > findSimilarities){
+                findMinSimilarities = findSimilarities;
                 findIndex = i;
             }
         }
 
-        if (cos.threshold < findMaxSimilarities){
+        if (cos.threshold > findMinSimilarities){
             log.info("가장 유사한 범죄자 발견: "+cos.criminals.get(findIndex));
-            log.info("유사도: "+findMaxSimilarities);
+            log.info("유사도: "+findMinSimilarities);
         }
 
-//        double compareSimilarity = cos.compareSimilarity(cos.labeledDescriptor, queryDescriptor);
-//        log.info(String.valueOf(compareSimilarity));
     }
 
     /**

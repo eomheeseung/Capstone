@@ -46,7 +46,6 @@ public class BaseController {
         double findMinSimilarities=1;
 
 
-        System.out.println(cos.criminals.size());
         //파싱한 쿼리 디스크립터와 범죄자의 디스크립터를 비교
         for (int i=0; i<cos.criminals.size(); i++){
 

@@ -24,8 +24,9 @@ public class BaseController {
 
     // 이것만 있으면 됨.
     @PostMapping("/test")
-    public void method1(@RequestBody String jsonString) {
+    public Double mainMethod(@RequestBody String jsonString) {
         String decodedJsonStr = null;
+
         try {
             decodedJsonStr = java.net.URLDecoder.decode(jsonString, StandardCharsets.UTF_8.name());
         } catch (Exception e) {
@@ -35,6 +36,7 @@ public class BaseController {
         //넘어오는 쿼리 디스크립터 Double[]로 넣기 위해 파싱
         String[] keys = decodedJsonStr.replace("{", "").replace("}", "").replace("=", "").split(",");
         Double[] queryDescriptor = new Double[keys.length];
+
         //쿼리 디스크립터 초기화
         for (int i = 0; i < keys.length; i++) {
             String[] keyValue = keys[i].split(":");
@@ -42,12 +44,12 @@ public class BaseController {
         }
 
         //범죄자 중 가장 낮은 유사도와 낮은 유사도를 갖는 범죄자 인덱스 찾기 위한 변수들
-        int findIndex=0;
-        double findMinSimilarities=1;
+        int findIndex = 0;
+        double findMinSimilarities = 1;
 
 
         //파싱한 쿼리 디스크립터와 범죄자의 디스크립터를 비교
-        for (int i=0; i<cos.criminals.size(); i++){
+        for (int i = 0; i < cos.criminals.size(); i++) {
 
             //유사도 비교를 위해 범죄자 디스크립터의 JSONObject 타입을 Double[]로 변환
             JSONArray ArrayCriminalDescriptor = new JSONArray(cos.criminals.get(i).get("5").toString());
@@ -59,17 +61,20 @@ public class BaseController {
 
             // 범죄자 중 가장 낮은 유사도를 찾음
             double findSimilarities = cos.compareSimilarity(DoubleCriminalDescriptor, queryDescriptor);
-            if (findMinSimilarities > findSimilarities){
+            if (findMinSimilarities > findSimilarities) {
                 findMinSimilarities = findSimilarities;
                 findIndex = i;
             }
         }
 
-        if (cos.threshold > findMinSimilarities){
-            log.info("가장 유사한 범죄자 발견: "+cos.criminals.get(findIndex));
-            log.info("유사도: "+findMinSimilarities);
+        if (cos.threshold > findMinSimilarities) {
+            log.info("가장 유사한 범죄자 발견: " + cos.criminals.get(findIndex));
+            log.info("유사도: " + findMinSimilarities);
         }
 
+//        log.info(Double.toString(findSimilarities));
+        log.info(Double.toString(findMinSimilarities));
+        return findMinSimilarities;
     }
 
     /**
@@ -110,6 +115,22 @@ public class BaseController {
 
         return "ok";
     }
+
+
+    /**
+     * findBastMatch()의 return값인 distance를 가져오는 contrller
+     *
+     * @param
+     * @return
+     */
+    @PostMapping("/distance")
+    public String requestDistance(@RequestBody String distance) {
+        log.info(distance);
+        double requestDistance = Double.parseDouble(distance.replace("=", ""));
+        log.info(Double.toString(requestDistance));
+        return distance;
+    }
+
 
     @PostMapping("/response/test")
     public String responseMethod(@RequestBody String dto) {

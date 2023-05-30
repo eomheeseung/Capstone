@@ -1,40 +1,28 @@
 package example.front_back.logic;
 
-import example.front_back.dto.RequestDTO;
-import example.front_back.dto.RequestDTO2;
-import example.front_back.dto.RequestDTO3;
 import lombok.extern.slf4j.Slf4j;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
 public class BaseLogic {
-    public String accept(RequestDTO dto) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("email", dto.getEmail());
-        jsonObject.put("pw", dto.getPw());
+    private Map<String, Object> map = new ConcurrentHashMap<>();
 
-        log.info(jsonObject.toJSONString());
-        return jsonObject.toJSONString();
-    }
+    public String findCrimeLogic(JSONObject findCrime) {
+        map.put("name", findCrime.get("0"));
+        map.put("country", findCrime.get("1"));
+        map.put("age", findCrime.get("2"));
+        map.put("criminal", findCrime.get("3"));
+        map.put("flag", findCrime.get("4"));
+        map.put("num", findCrime.get("6"));
 
-    public String accept2(RequestDTO2 dto2) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", dto2.getName());
-        jsonObject.put("phoneNumber", dto2.getPhoneNumber());
-        jsonObject.put("flag", dto2.isFlag());
+        JSONObject jsonObject = new JSONObject(map);
+        map.clear();
 
-        log.info(jsonObject.toJSONString());
-        return jsonObject.toJSONString();
-    }
-
-    public String accept3(RequestDTO3 dto) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", dto.getId());
-        jsonObject.put("password", dto.getPassword());
-
-        log.info(jsonObject.toJSONString());
-        return jsonObject.toJSONString();
+        return jsonObject.toString();
     }
 }

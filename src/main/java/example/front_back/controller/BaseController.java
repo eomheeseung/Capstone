@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,6 +20,9 @@ import java.nio.charset.StandardCharsets;
 public class BaseController {
     private final BaseLogic logic;
     private final ComparisonOfSimilarities cos;
+    private JSONObject findCrime;
+
+    private HashMap<String, Object> map = new HashMap<>();
 
     private final CrimeDataLogic crimeDataLogic;
 
@@ -69,12 +73,22 @@ public class BaseController {
 
         if (cos.threshold > findMinSimilarities) {
             log.info("가장 유사한 범죄자 발견: " + cos.criminals.get(findIndex));
+//            타입확인: cos.criminals.get(findIndex) => jsonObject
+//            log.info(cos.criminals.get(findIndex).getClass().getTypeName());
+            findCrime = cos.criminals.get(findIndex);
             log.info("유사도: " + findMinSimilarities);
         }
 
 //        log.info(Double.toString(findSimilarities));
         log.info(Double.toString(findMinSimilarities));
         return findMinSimilarities;
+    }
+
+    @PostMapping("/findCrime")
+    public String findCrime(@RequestBody String flag) {
+//        log.info(flag);
+
+        return logic.findCrimeLogic(findCrime);
     }
 
     /**
